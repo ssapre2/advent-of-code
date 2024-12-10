@@ -24,7 +24,7 @@ class TextGrid:
         self.letter_count = 0
 
         # Initialize list of current letters in word
-        self.word_list = list()
+        self.current_word =  list()
         
         with open(input_file,"r") as text_file:
             # read text file into list of strings
@@ -57,9 +57,11 @@ class TextGrid:
         split_text = list(map(lambda x: list(x.rstrip()) ,self.text))
 
         self.text_grid = np.array(split_text)
+
+        # list to track all words created
+        self.word_list = list()
         
         print(f"Matrix Dimension = {self.text_grid.shape}")
-        #print(self.text_grid)
 
     
     # Now let's traverse this grid in search of the 'X', our starting point
@@ -67,6 +69,8 @@ class TextGrid:
 
         possible_x = range(-1,2,1)
         possible_y = range(-1,2,1)
+        possible_directions = [(x,y) for x in possible_x for y in possible_y]
+
 
         # Loop thru grid to find X's
         while self.row < self.text_grid.shape[0] and self.col < self.text_grid.shape[1]:
@@ -77,56 +81,73 @@ class TextGrid:
                 print(f"X at ({self.row+1},{self.col+1})")
                 self.x_positions.append((self.row,self.col))
                 # Add X to word list
-                self.word_list.append('X')
-                self.letter_count+=1
+                #self.current_word.append('X')
+                #self.letter_count+=1
                 # Try all direction combinations
-                possible_directions = [(x,y) for x in possible_x for y in possible_y]
                 # Apply 'find_word' function to list
-                xmas_finds = [self.find_word(x = self.row, y= self.col,x_dir=  direction[0],y_dir = direction[1]) for direction in possible_directions]
-            
+                trials = [self.find_word(x_coord = self.row, y_coord= self.col,x_dir=  direction[0],y_dir = direction[1]) for direction in possible_directions]
+                # Reset word list for next X
                 # Add to count 
-                self.xmas_count += len(xmas_finds)
+                #self.xmas_count += len(trials)
             # if it's the end of the row, move down 1 row and reset column index
             if self.col >= self.text_grid.shape[1]-1:
                 self.row += 1
                 self.col = 0           
-                self.word_list.clear()
+                self.current_word.clear()
                 self.letter_count = 0
 
             else:
                 self.col += 1
-                self.word_list.clear()
+                self.current_word.clear()
                 self.letter_count = 0
 
     
          
 
-    def find_word(self,x,y,x_dir, y_dir):
-        print(f"Direction ({x_dir},{y_dir})")
+    def find_word(self,x_coord,y_coord,x_dir, y_dir):
+       # print(f"Direction ({x_dir},{y_dir})")
 
-        # If target hits
-        if  self.word_list == self.target:
-            print(self.word_list)
-            return(self.word_list)
-        # Check that we're on the way the 'XMAS'
-        elif self.word_list != self.target[len(self.word_list):]: 
+        try:
+            current_letter = self.text_grid[x_coord,y_coord]
+            self.current_word.append(current_letter)
+
+        except:
+            print(f"Index ({x_coord+1,y_coord+1}) Not in test grid")
+            #return(self.current_word)
+            self.current_word.append('')
+
+        
+
+        # If we get to 'XMAS' return word
+        if  self.current_word == self.target:
+            # Add to word list
+            self.word_list.append(self.current_word)
+            print(f"CURRENT WORDS = {self.word_list}")
+            self.xmas_count += 1
+            print(f"COUNT: {self.xmas_count}")
+            self.current_word.clear()
+            #return(self.current_word)
+        # Check that we're on the way the to 'XMAS'
+        elif self.current_word != self.target[:len(self.current_word)]: 
+            print(f"current word = {self.current_word} and target = {self.target[:len(self.current_word)]}")
             # Clear word list tracker
-            print(f"Not on track w/ {self.word_list}")
+            print(f"Not on track w/ {self.current_word}")
+            #return(self.current_word)
+            self.current_word.clear()
 
         else:
-            x += x_dir
-            y += y_dir
-            try:
-                next_letter = self.text_grid[x,y]
-                print(f"Next Letter {next_letter}")
-                self.letter_count += 1
-                print(self.letter_count)
+                #next_letter = self.text_grid[x,y]
+                #print(f"Next Letter {next_letter}")
+                #self.letter_count += 1
+                #print(self.letter_count)
                 # Add letter to word count
-                self.word_list.append(next_letter)
                 # Recurse
-                self.find_word(x,y,x_dir,y_dir)
-            except Exception as E:
-                print(f"Index ({x,y}) Not in test grid")
+                # Increment coords in specified direction
+            x = x_coord + x_dir
+            y = x_coord + y_dir
+            self.find_word(x_coord=x,y_coord = y,x_dir= x_dir,y_dir = y_dir)
+                
+
 
 
 
