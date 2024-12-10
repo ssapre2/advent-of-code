@@ -80,8 +80,7 @@ class TextGrid:
             if self.current_letter == 'X':
                 print(f"X at ({self.row+1},{self.col+1})")
                 self.x_positions.append((self.row,self.col))
-                # Add X to word list
-                #self.current_word.append('X')
+
                 #self.letter_count+=1
                 # Try all direction combinations
                 # Apply 'find_word' function to list
@@ -107,15 +106,6 @@ class TextGrid:
     def find_word(self,x_coord,y_coord,x_dir, y_dir):
        # print(f"Direction ({x_dir},{y_dir})")
 
-        try:
-            current_letter = self.text_grid[x_coord,y_coord]
-            self.current_word.append(current_letter)
-
-        except:
-            print(f"Index ({x_coord+1,y_coord+1}) Not in test grid")
-            #return(self.current_word)
-            self.current_word.append('')
-
         
 
         # If we get to 'XMAS' return word
@@ -128,6 +118,9 @@ class TextGrid:
             self.current_word.clear()
             #return(self.current_word)
         # Check that we're on the way the to 'XMAS'
+        elif (x_coord < 0 or y_coord < 0):
+            assert("index out of bounds on grid")
+            self.current_word.clear()
         elif self.current_word != self.target[:len(self.current_word)]: 
             print(f"current word = {self.current_word} and target = {self.target[:len(self.current_word)]}")
             # Clear word list tracker
@@ -144,8 +137,20 @@ class TextGrid:
                 # Recurse
                 # Increment coords in specified direction
             x = x_coord + x_dir
-            y = x_coord + y_dir
-            self.find_word(x_coord=x,y_coord = y,x_dir= x_dir,y_dir = y_dir)
+            y = y_coord + y_dir
+            try:
+                # Grab current letter on grid
+                current_letter = self.text_grid[x_coord,y_coord]
+                # Add X to word list
+                self.current_word.append(current_letter)
+                # Recursively find next words
+                self.find_word(x_coord=x,y_coord = y,x_dir= x_dir,y_dir = y_dir)
+
+
+            except:
+                print(f"Index ({x_coord+1,y_coord+1}) Not in test grid")
+                #return(self.current_word)
+                self.current_word.append('')
                 
 
 
