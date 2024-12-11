@@ -11,10 +11,6 @@ class TextGrid:
 
         # Count overall number of "XMAS"'s found
         self.xmas_count = 0
-        self.target = ['X','M','A','S']
-
-        # Keep track of number of letters in word so far
-        self.letter_count = 0
 
         # Initialize list of current letters in word
         self.current_word =  list()
@@ -26,13 +22,17 @@ class TextGrid:
         # Create a matrix out of the text file outputs. We want to traverse this grid
         self.create_grid()
 
-        # Initialize iterators
+        # Initialize 
+        # Keeps track of current letter
         self.current_letter = self.text_grid[1,1]
+        # Indices
         self.row = 0
         self.col = 0
+        # Position of important pivot letter
         self.x_positions = list()
         self.x = 0 
         self.y = 0
+        self.list_A = {}
         
 
     # Create function to create a grid of the 
@@ -40,12 +40,10 @@ class TextGrid:
 
         # Number of elements
         n_rows = len(self.text)
-        #print(f"Number of Rows {n_rows}")
 
         # remove newline 
         n_letters = len(self.text[1].rstrip())
         # Turn into list
-        #print(f"Number of letters {n_letters}")
 
         # Split each line into list of elements, remove newline character
         split_text = list(map(lambda x: list(x.rstrip()) ,self.text))
@@ -54,82 +52,82 @@ class TextGrid:
 
         # list to track all words created
         self.word_list = list()
-        #print(self.text_grid)
+
+
+
+
+    # Define movable directions    
+    def find_possible_directions(self,poss_x,poss_y):
+        # These are the directions to be moved in
+        self.possible_directions = [(x,y) for x in poss_x for y in poss_y]
         
-        #print(f"Matrix Dimension = {self.text_grid.shape}")
 
     
-    # Now let's traverse this grid in search of the 'X', our starting point
-    def find_next_x(self):
+    # Now let's traverse this grid in search of the pivot or starting point and target word
+    def find_pivot_letter(self,pivot,target_word):
 
-        possible_x = range(-1,2,1)
-        possible_y = range(-1,2,1)
-        possible_directions = [(x,y) for x in possible_x for y in possible_y]
+
 
 
         # Loop thru grid to find X's
         while self.row < self.text_grid.shape[0] and self.col < self.text_grid.shape[1]:
             self.current_letter = self.text_grid[self.row,self.col]
 
-            if self.current_letter == 'X':
-                #print(f"X at ({self.row+1},{self.col+1})-------------------")
+            if self.current_letter == pivot:
+                # Store pivot Positions
                 self.x_positions.append((self.row,self.col))
 
-                #self.letter_count+=1
-                # Try all direction combinations
-                # Apply 'find_word' function to list
-                trials = [self.find_word(x_coord = self.row, y_coord= self.col,x_dir=  direction[0],y_dir = direction[1]) for direction in possible_directions]
-                # Reset word list for next X
-                # Add to count 
-                #self.xmas_count += len(trials)
-            # if it's the end of the row, move down 1 row and reset column index
+             # if it's the end of the row, move down 1 row and reset column index
             if self.col >= self.text_grid.shape[1]-1:
                 self.row += 1
                 self.col = 0           
                 self.current_word.clear()
-                self.letter_count = 0
 
             else:
                 self.col += 1
                 self.current_word.clear()
-                self.letter_count = 0
 
         print("Finished Traversal")
-    
+
+    def find_next_s(self):
+        pass
          
 
-    def find_word(self,x_coord,y_coord,x_dir, y_dir):
+    def find_xmas(self,x_coord,y_coord,x_dir, y_dir,target):
+
+        # Update function to find A counts
         
-        #print(f"Direction - ({x_dir},{y_dir})")
 
         # If we get to 'XMAS' return word
-        if  self.current_word == self.target:
+        if  self.current_word == target:
             # Add to word list
             self.word_list.append(self.current_word)
-            #print(f"CURRENT WORDS = {self.word_list}")
+
             self.xmas_count += 1
-           # print(f"COUNT: {self.xmas_count}")
+
             self.current_word.clear()
             #return(self.current_word)
-        # Check that we're on the way the to 'XMAS'
+            if self.a_coords in self.list_A:
+                self.list_A[self.a_coords] += 1
+            else:
+                self.list_A[self.a_coords] = 1
+                self.current_word.clear()
+                # Clear 'A' tracker
+                self.current_a = None
+        # Check that we're on the way the to target 'XMAS' or 'MMASS'
         elif (x_coord < 0 or y_coord < 0):
             assert("index out of bounds on grid")
             self.current_word.clear()
-        elif self.current_word != self.target[:len(self.current_word)]: 
-            #print(f"current word = {self.current_word} and target = {self.target[:len(self.current_word)]}")
+            self.current_a = None
+
+        elif self.current_word != target[:len(self.current_word)]: 
+
             # Clear word list tracker
-            #print(f"Not on track w/ {self.current_word}")
-            #return(self.current_word)
             self.current_word.clear()
+            self.current_a = None
 
         else:
-                #next_letter = self.text_grid[x,y]
-                #print(f"Next Letter {next_letter}")
-                #self.letter_count += 1
-                #print(self.letter_count)
-                # Add letter to word count
-                # Recurse
-                # Increment coords in specified direction
+            # Increment coords in specified direction
             x = x_coord + x_dir
             y = y_coord + y_dir
             try:
@@ -138,39 +136,51 @@ class TextGrid:
                 
                 # Add X to word list
                 self.current_word.append(current_letter)
-                #print(f"Position ({x_coord+1},{y_coord+1}) - {current_letter} -{self.current_word}")
+
+                # If A is the current letter find it's coordinate points
+                if current_letter == "A":
+                    self.current_a = current_letter
+                    a_coords = (x_coord+1,y_coord + 1)
+                    self.a_coords = a_coords
+                
                 # Recursively find next words
-                self.find_word(x_coord=x,y_coord = y,x_dir= x_dir,y_dir = y_dir)
+                self.find_xmas(x_coord=x,y_coord = y,x_dir= x_dir,y_dir = y_dir,target = target)
 
 
             except Exception as e:
-                #print(f"Index ({x_coord+1,y_coord+1}) Not in text grid")
-                #return(self.current_word)
-                #self.current_word.append('')
+
                 self.current_word.clear()
-                
+                self.current_a = None
 
 
-
-
-
-        
-
-        
-
-            
-        
 
 
 
 def main():
-# Main body of code. Other functions and class methods are called from main.
+    # Problem 1
     start = datetime.now()
-    obj = TextGrid('input1.txt')
-    obj.find_next_x()
+    obj1 = TextGrid('input1.txt')
+    obj1.find_pivot_letter('X',target_word=['X','M','A','S'])
+    obj1.find_possible_directions(range(-1,2,1),range(-1,2,1))
+    
+    # Apply 'find_word' function to list
+    trials = [obj1.find_xmas(x_coord = letter_coords[0], y_coord= letter_coords[1],x_dir=  direction[0],y_dir = direction[1],target = ['X','M','A','S']) for direction in obj1.possible_directions for letter_coords in obj1.x_positions]
     end = datetime.now()
-    print(obj.xmas_count)
-    print(f"{end - start} seconds")
+    print(f"Part 1 Answer: {obj1.xmas_count} - {end - start} seconds")
+
+    # Problem 2
+    start = datetime.now()
+    obj2 = TextGrid('input1.txt')
+    obj2.find_pivot_letter('S',target_word=['S','A','M'])
+     # Apply 'find_word' function to list
+    obj2.find_possible_directions((-1,1),(-1,1))
+    trials = [obj2.find_xmas(x_coord = letter_coords[0], y_coord= letter_coords[1],x_dir=  direction[0],y_dir = direction[1],target = ['S','A','M']) for direction in obj2.possible_directions for letter_coords in obj2.x_positions]
+    # Get Elements of dictionary that have > 1 'A' aka get number of 'A's overlapped when searching for 'SAM'
+    overlapping_a = {k: v for k, v in obj2.list_A.items() if v > 1}
+    end =  datetime.now()
+    print(f"Part 1 Answer: {len(overlapping_a)} - {end - start} seconds")
+
+
 
 if __name__ == "__main__":
     main()
