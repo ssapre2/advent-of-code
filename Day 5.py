@@ -1,4 +1,6 @@
 import numpy as np
+from datetime import datetime
+
 
 # Setup class to keep track progress, important attributes of word search
 
@@ -168,9 +170,12 @@ class TextGrid:
 
 def main():
 # Main body of code. Other functions and class methods are called from main.
+    start = datetime.now()
     obj = TextGrid('sample_text.txt')
     obj.find_next_x()
+    end = datetime.now()
     print(obj.xmas_count)
+    print(f"{end - start} seconds")
 
     #obj.find_word(x = obj.x_positions[0][0],y = obj.x_positions[0][1],x_dir=-1,y_dir=0)
 
