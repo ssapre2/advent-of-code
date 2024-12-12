@@ -1,9 +1,3 @@
-
-class StoneList:
-
-    def __init__(self):
-        pass
-
 # To flatten list
 import itertools
 from datetime import datetime
@@ -37,6 +31,17 @@ def blink(stones: list):
     # Flatten list
     return(new_stones)
 
+
+# Split the stone into 2
+def split(stone):
+    #print(f"splitting {stone}")
+    mid_number_str_list = list(str(stone))
+    mid_pos = len(mid_number_str_list) // 2 
+    left_stone = int(''.join(mid_number_str_list[mid_pos:]))
+    right_stone = int(''.join(mid_number_str_list[:mid_pos]))
+    return([left_stone,right_stone])
+    
+
             
 def run_exp(stone_list,n):
 
@@ -50,15 +55,7 @@ def run_exp(stone_list,n):
 
 
 
-# Split the stone into 2
-def split(stone):
-    #print(f"splitting {stone}")
-    mid_number_str_list = list(str(stone))
-    mid_pos = len(mid_number_str_list) // 2 
-    left_stone = int(''.join(mid_number_str_list[mid_pos:]))
-    right_stone = int(''.join(mid_number_str_list[:mid_pos]))
-    return([left_stone,right_stone])
-    
+
 
 def main():
     new_stones = blink(stones=[125,17])
