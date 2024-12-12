@@ -1,0 +1,87 @@
+
+class StoneList:
+
+    def __init__(self):
+        pass
+
+# To flatten list
+import itertools
+from datetime import datetime
+
+# Divide Stones and conquer
+def blink(stones: list):
+
+
+    # Base case
+    if len(stones) == 1:
+        stone = stones[0]
+
+        if stone == 0:
+            return[1]
+        elif len(str(stone)) % 2 == 0:
+            split_stone = split(stone)
+            return(split_stone)
+        else:
+            return[stone*2024]
+        
+    else:
+        # Divide list in half and split right and left
+        mid = len(stones) // 2
+        #print(f"Going Left")
+        left = blink(stones[:mid])
+        #print(f"Going Right")
+        right = blink(stones[mid:])
+        new_stones = left + right
+        #print(f"New stones {new_stones}")
+
+    # Flatten list
+    return(new_stones)
+
+            
+def run_exp(stone_list,n):
+
+    new_stones = stone_list
+    for i in range(n):
+        new_stones = blink(new_stones)
+        #print(f"Blink {i+1} - {new_stones}")
+    return new_stones
+
+
+
+
+
+# Split the stone into 2
+def split(stone):
+    #print(f"splitting {stone}")
+    mid_number_str_list = list(str(stone))
+    mid_pos = len(mid_number_str_list) // 2 
+    left_stone = int(''.join(mid_number_str_list[mid_pos:]))
+    right_stone = int(''.join(mid_number_str_list[:mid_pos]))
+    return([left_stone,right_stone])
+    
+
+def main():
+    new_stones = blink(stones=[125,17])
+    print(new_stones)
+
+    # initial experiment
+
+    #i = 1
+    init_stones = [125,17]
+    # Part 1
+    start = datetime.now()
+    input_stones = [510613, 358, 84, 40702, 4373582, 2, 0, 1584]
+    print(len(run_exp(input_stones,25)))
+    end = datetime.now()
+    print(f"Part 1 {end-start} seconds")
+
+    # Part 1
+    start = datetime.now()
+    input_stones = [510613, 358, 84, 40702, 4373582, 2, 0, 1584]
+    print(len(run_exp(input_stones,75)))
+    end = datetime.now()
+    print(f"Part 2 {end-start} seconds")
+
+
+if __name__ == "__main__":
+    main()
