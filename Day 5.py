@@ -58,6 +58,8 @@ class TextGrid:
         
         #print(f"Matrix Dimension = {self.text_grid.shape}")
 
+    def find_next_
+
     
     # Now let's traverse this grid in search of the 'X', our starting point
     def find_next_x(self):
