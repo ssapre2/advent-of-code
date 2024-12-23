@@ -1,83 +1,102 @@
+
+class StoneList:
+
+    def __init__(self,stones,n):
+        self.tracker = list()
+        self.lookup = dict()
+        # Initialize
+        self.stones = stones
+        #self.blink_count = dict.fromkeys([i for i in range(1,n+1)], 0)
+        #print(self.blink_count)
+        self.n = n
+        # Current Stone
+        self.x = 0
+        # Call blink function
+        #self.blink(self.stones,self.n)
+        self.stone_count = list()
+        for stone in stones:
+            # Call blink function on each stone
+            # self.x is number of stones for current blink round
+            #print(f"NEW STONE: {stone} -------- stone count after {self.n} blinks = {self.stone_count}")
+            self.blink(stone, self.n)
+
+
+        print(self.x)
+
+    def find_next_number(self,stone,n):
+       # print(f'Find Stone: {stone} after {self.n - n + 1} blink(s)')
+        # Iterate thru blink scenarios
+        if stone == 0:
+            next_number = 1
+            #print(f"Adding 1 @ blink {self.n-n+1}")
+            self.blink(1,n=n-1)
+        elif len(str(stone)) % 2 == 0:
+            #print(f'Split Stone {stone}')
+            self.split(stone,n=n)
+        else:
+            next_number = stone * 2024
+            #init lookup value
+            self.lookup[(stone,n)] = 1
+            # Apply function to next number
+            self.blink(next_number,n=n-1)
+
+    # Only send one stone at a time
+    def blink(self,stone: int,n: int):
+
+        # Iterate thru list of stones (numbers), add required calculation to dictionary lookup
+        if n == 0:
+            #print(f"Returning: {stone}")
+            self.x += 1
+            #return(stone)
+        else:
+            #print(f"Stone: {stone} - n: {self.n-n}")
+            # Lookup current number  to find next stone
+            if (stone,n) not in self.lookup:
+                #self.blink_count[n] += 1
+                self.find_next_number(stone,n)
+            else:
+                # Count it, we already have the next number
+                #self.blink_count[n] += 1
+                #print(f"Lookup {stone} @ blink {n}")
+                # Pass new number thru function
+                self.blink(stone=self.lookup[(stone,n)],n = n-1)
+                #self.x += n
+              
+    # Split the stone into 2
+    def split(self,stone,n):
+        mid_number_str = str(stone)
+        mid_pos = len(mid_number_str) // 2 
+        left_stone = int(''.join(mid_number_str[mid_pos:]))
+        self.blink(left_stone,n=n-1)
+        right_stone = int(''.join(mid_number_str[:mid_pos]))
+        self.blink(right_stone,n=n-1)
+
+
+
+
 # To flatten list
 import itertools
-from datetime import datetime
-
-# Divide Stones and conquer
-def blink(stones: list):
-
-
-    # Base case
-    if len(stones) == 1:
-        stone = stones[0]
-
-        if stone == 0:
-            return[1]
-        elif len(str(stone)) % 2 == 0:
-            split_stone = split(stone)
-            return(split_stone)
-        else:
-            return[stone*2024]
-        
-    else:
-        # Divide list in half and split right and left
-        mid = len(stones) // 2
-        #print(f"Going Left")
-        left = blink(stones[:mid])
-        #print(f"Going Right")
-        right = blink(stones[mid:])
-        new_stones = left + right
-        #print(f"New stones {new_stones}")
-
-    # Flatten list
-    return(new_stones)
-
-
-# Split the stone into 2
-def split(stone):
-    #print(f"splitting {stone}")
-    mid_number_str_list = list(str(stone))
-    mid_pos = len(mid_number_str_list) // 2 
-    left_stone = int(''.join(mid_number_str_list[mid_pos:]))
-    right_stone = int(''.join(mid_number_str_list[:mid_pos]))
-    return([left_stone,right_stone])
-    
-
-            
-def run_exp(stone_list,n):
-
-    new_stones = stone_list
-    for i in range(n):
-        new_stones = blink(new_stones)
-        #print(f"Blink {i+1} - {new_stones}")
-    return new_stones
-
-
-
-
-
-
+from datetime import datetime 
 
 def main():
-    new_stones = blink(stones=[125,17])
-    print(new_stones)
+    #new_stones = StoneList(stones=[125,17],n=25)
+    #new_stones = obj.blink()
+   # print(new_stones.blink_count)
+    #print(len(new_stones))
 
     # initial experiment
 
     #i = 1
-    init_stones = [125,17]
+    #init_stones = [125,17]
     # Part 1
     start = datetime.now()
     input_stones = [510613, 358, 84, 40702, 4373582, 2, 0, 1584]
-    print(len(run_exp(input_stones,25)))
-    end = datetime.now()
-    print(f"Part 1 {end-start} seconds")
-
-    # Part 1
-    start = datetime.now()
-    input_stones = [510613, 358, 84, 40702, 4373582, 2, 0, 1584]
-    print(len(run_exp(input_stones,75)))
+    StoneList(input_stones,25)
+    #print(dict(input_stones))
     end = datetime.now()
     print(f"Part 2 {end-start} seconds")
+
+    # Part 1
 
 
 if __name__ == "__main__":
