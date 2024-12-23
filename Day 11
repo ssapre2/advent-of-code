@@ -90,7 +90,7 @@ def main():
     # Part 1
     start = datetime.now()
     input_stones = [510613, 358, 84, 40702, 4373582, 2, 0, 1584]
-    StoneList(input_stones,75)
+    StoneList(input_stones,45)
     end = datetime.now()
     print(f"Part 2 {end-start} seconds")
 
