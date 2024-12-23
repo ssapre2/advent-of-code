@@ -35,8 +35,8 @@ class StoneList:
             self.split(stone,n=n)
         else:
             next_number = stone * 2024
-            #init lookup value
-            self.lookup[(stone,n)] = 1
+            #print(f"Adding {next_number} to lookup @ blink {self.n-n+1}")
+            self.lookup[stone] = next_number
             # Apply function to next number
             self.blink(next_number,n=n-1)
 
@@ -51,7 +51,7 @@ class StoneList:
         else:
             #print(f"Stone: {stone} - n: {self.n-n}")
             # Lookup current number  to find next stone
-            if (stone,n) not in self.lookup:
+            if stone not in self.lookup:
                 #self.blink_count[n] += 1
                 self.find_next_number(stone,n)
             else:
@@ -59,16 +59,15 @@ class StoneList:
                 #self.blink_count[n] += 1
                 #print(f"Lookup {stone} @ blink {n}")
                 # Pass new number thru function
-                self.blink(stone=self.lookup[(stone,n)],n = n-1)
-                #self.x += n
+                self.blink(stone=self.lookup[stone],n = n-1)
               
     # Split the stone into 2
     def split(self,stone,n):
-        mid_number_str = str(stone)
-        mid_pos = len(mid_number_str) // 2 
-        left_stone = int(''.join(mid_number_str[mid_pos:]))
+        mid_number_str_list = list(str(stone))
+        mid_pos = len(mid_number_str_list) // 2 
+        left_stone = int(''.join(mid_number_str_list[mid_pos:]))
         self.blink(left_stone,n=n-1)
-        right_stone = int(''.join(mid_number_str[:mid_pos]))
+        right_stone = int(''.join(mid_number_str_list[:mid_pos]))
         self.blink(right_stone,n=n-1)
 
 
@@ -97,6 +96,12 @@ def main():
     print(f"Part 2 {end-start} seconds")
 
     # Part 1
+    # start = datetime.now()
+    # input_stones = [510613, 358, 84, 40702, 4373582, 2, 0, 1584]
+    
+    # print(len(run_exp(input_stones=input_stones,n = 3)))
+    # end = datetime.now()
+    # print(f"Part 2 {end-start} seconds")
 
 
 if __name__ == "__main__":
